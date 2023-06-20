@@ -1,0 +1,140 @@
+<html>
+<head>
+ <title>shader2</title>
+</head>
+<body>
+ <canvas id="glCanvas" style="width:400px; height:400px;" />
+ <!-- type="notjs" makes it not get identified as javascript. -->
+ <script id="vertex-shader" type="notjs">
+#version 300 es
+in vec4 pos;
+out vec2 coord;
+uniform float u_time;
+
+void main(){
+
+   coord = pos.xy + 0.5;
+
+   gl_Position = pos;
+}
+ </script>
+ <script id="fragment-shader" type="notjs">
+#version 300 es
+precision mediump float;
+in vec2 coord;
+out vec4 color_out;
+float dot2(vec2 v ) {
+   return dot(v,v);
+}
+float sdTrapezoid( in vec2 p, in float r1, float r2, float he )
+{
+    vec2 k1 = vec2(r2,he);
+    vec2 k2 = vec2(r2-r1,2.0*he);
+    p.x = abs(p.x);
+    vec2 ca = vec2(p.x-min(p.x,(p.y<0.0)?r1:r2), abs(p.y)-he);
+    vec2 cb = p - k1 + k2*clamp( dot(k1-p,k2)/dot2(k2), 0.0, 1.0 );
+    float s = (cb.x<0.0 && ca.y<0.0) ? -1.0 : 1.0;
+    return s*sqrt( min(dot2(ca), dot2(cb)) );
+}
+
+float sdf(vec2 p, float a, float b, float c){
+   return sdTrapezoid(p, a, b, c);
+}
+
+void main() {
+   vec2 center = vec2(0.5, 0.5);
+   vec2 p = ( coord.xy - center.xy) / center.y;
+   if (sdf(p, 1.0, 0.3, 1.0) <= 0.0)
+      color_out = vec4(1.0);
+   else
+      color_out = vec4(vec3(0.0),1.0);
+
+   if (sdf(vec2(p.x, p.y-0.5), 0.3,0.1,0.3) <= 0.0)
+      color_out = vec4(vec3(0.0),1.0);
+
+   if (sdf(vec2(p.x, p.y+0.6), 0.75,0.35,0.6) <= 0.0)
+      color_out = vec4(vec3(0.0),1.0);
+
+}
+ </script>
+ <script type="text/javascript">
+function createProgram( gl, vertexSrc, fragmentSrc ) {
+   let vshd = gl.createShader( gl.VERTEX_SHADER );
+   gl.shaderSource( vshd, vertexSrc );
+   gl.compileShader( vshd );
+   if (!gl.getShaderParameter( vshd, gl.COMPILE_STATUS ))
+      throw new Error( "Unable to compile shader: "+gl.getShaderInfoLog( vshd ));
+   let fshd = gl.createShader( gl.FRAGMENT_SHADER );
+   gl.shaderSource( fshd, fragmentSrc );
+   gl.compileShader( fshd );
+   if (!gl.getShaderParameter( fshd, gl.COMPILE_STATUS ))
+      throw new Error( "Unable to compile shader: "+gl.getShaderInfoLog( fshd ));
+   let prog = gl.createProgram();
+   gl.attachShader( prog, vshd );
+   gl.attachShader( prog, fshd );
+   gl.linkProgram( prog );
+   if (!gl.getProgramParameter( prog, gl.LINK_STATUS ))
+      throw new Error( "Unable to link program: "+gl.getProgramInfoLog( prog ));
+   return prog;
+}
+
+function init() {
+   
+   
+   var c = document.getElementById('glCanvas');
+   var gl = c.getContext('webgl2');
+   if (!gl)
+      throw new Error("WebGL unsupported!");
+
+   // Clear screen
+   gl.clearColor(0, 0, 0, 0);
+   gl.clear(gl.COLOR_BUFFER_BIT);
+
+   /*
+    2___3
+    |\  |
+    | \ |
+    |__\|
+    0   1
+   */
+   var vertexPosBuffer = gl.createBuffer();
+   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPosBuffer);
+   var vertices = [
+      -1, -1,
+       1, -1,
+      -1,  1,
+       1,  1 ];
+   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+   vertexPosBuffer.itemSize = 2;
+   vertexPosBuffer.numItems = 4;
+
+   // Create our shader program
+   var vs = document.querySelector("#vertex-shader").text.trim();
+   var fs = document.querySelector("#fragment-shader").text.trim();
+   var program = createProgram(gl, vs, fs);
+   var u_time_loc = gl.getUniformLocation(program, "u_time");
+   gl.useProgram(program);
+
+   function render( ms_since_page_loaded ) {
+   // Convert to seconds and send to shader
+   gl.uniform1f( u_time_loc, ms_since_page_loaded * 0.001 );
+
+   // Draw scene here using uniform float u_time to animate
+   // Below is an example using the relevant code from the WebGL skeleton
+   gl.useProgram( program );
+   gl.enableVertexAttribArray(program.vertexPosAttrib);
+   gl.vertexAttribPointer(program.vertexPosAttrib, 2, gl.FLOAT, false, 0, 0);
+   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+   // Request animation again
+   requestAnimationFrame( render );
+   }
+
+   render(0);
+   
+}
+window.onload = init;
+ </script>
+</body>
+</html>
+

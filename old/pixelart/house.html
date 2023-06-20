@@ -1,0 +1,149 @@
+<html>
+<head>
+ <title>House Homework</title>
+ <meta name="Y.SUZUKI" content="Yoshie (1W182175)" />
+ <script>
+   let canvas;    // DOM object corresponding to the canvas
+   let graphics;  // 2D graphics context for drawing to the canvas
+   // Drawing function
+   function draw() {
+      // 2nd floor roof
+      graphics.fillStyle = "#221400";
+      graphics.fillRect(45, 65.5, 175, 2.5);
+
+      graphics.beginPath();
+      graphics.moveTo(45,68);
+      graphics.lineTo(220,68);
+      graphics.lineTo(255,105);
+      graphics.lineTo(10,105)
+      graphics.closePath();
+      graphics.strokeStyle = "#221400";
+      graphics.stroke();
+      graphics.fillStyle = "#563303";
+      graphics.fill();
+
+      // shadow
+      graphics.fillStyle = "#000000";
+      graphics.fillRect(45, 105, 175, 5);
+
+      // 2nd floor
+      graphics.fillStyle = "#f0cd9f";
+      graphics.fillRect(45, 110, 175, 30);
+
+      // 2nd floor window
+      graphics.strokeStyle = "#221400";
+      graphics.lineWidth = 1;
+      graphics.strokeRect(103, 120, 60, 10);
+      graphics.clearRect(103, 120, 60, 10);
+      for(var i = 0; i < 12; i++){
+         graphics.beginPath();
+         graphics.moveTo(103 + i * 5, 120);
+         graphics.lineTo(103 + i * 5, 130);
+         graphics.strokeStyle = "#221400";
+         graphics.lineWidth = 1;
+         graphics.stroke();
+      }
+
+      // 1st floor roof
+      graphics.beginPath();
+      graphics.moveTo(45,140);
+      graphics.lineTo(220,140);
+      graphics.lineTo(255,165);
+      graphics.lineTo(10,165)
+      graphics.closePath();
+      graphics.strokeStyle = "#221400";
+      graphics.stroke();
+      graphics.fillStyle = "#563303";
+      graphics.fill();
+
+      for(var i = 0; i < 49; i++){
+         if(i % 4 == 0){
+            graphics.fillStyle = "#ccc5bc";
+         }else{
+            graphics.fillStyle = "#221400";
+         }
+         graphics.fillRect(10 + i * 5, 165, 5, 5);
+      }
+
+      // // shadow
+      graphics.fillStyle = "#000000";
+      graphics.fillRect(45, 170, 175, 2.5);
+
+      // // 1st floor
+      graphics.fillStyle = "#f0cd9f";
+      graphics.fillRect(45, 172.5, 175, 50);
+
+      for(var i = 0; i < 35; i++){
+         if(i % 3 == 0){
+            graphics.fillStyle = "#80633d";
+         }else{
+            graphics.fillStyle = "#221400";
+         }
+         graphics.fillRect(45 + i * 5, 202.5, 5, 30);
+      }
+
+      // door
+      graphics.strokeStyle = "#221400";
+      graphics.lineWidth = 2.5;
+      graphics.strokeRect(117.5, 187, 30, 45);
+      graphics.clearRect(117.5, 187, 30, 45);
+      for(var i = 0; i < 6; i++){
+         graphics.beginPath();
+         graphics.moveTo(117.5 + i * 5, 187);
+         graphics.lineTo(117.5 + i * 5, 232);
+         graphics.strokeStyle = "#8b5000";
+         graphics.lineWidth = 1;
+         graphics.stroke();
+      }
+      graphics.fillStyle = "#8b5000";
+      graphics.fillRect(131.5, 187, 2.5, 45);
+      graphics.fillStyle = "#000000";
+      graphics.fillRect(131.5, 207, 2.5, 5);
+
+      // 1st floor windows
+      graphics.strokeStyle = "#8b5000";
+      graphics.beginPath();
+      graphics.arc(80, 200, 20, 0, 2 * Math.PI);
+      graphics.closePath();
+      graphics.fill();
+      graphics.beginPath();
+      graphics.globalCompositeOperation = "destination-out";
+      graphics.arc(80, 200, 17.5, 0, Math.PI*2, false);
+      graphics.closePath();
+      graphics.fill();
+
+      graphics.globalCompositeOperation = "source-over";
+      graphics.beginPath();
+      graphics.moveTo(62.5, 200);
+      graphics.lineTo(97.5, 200);
+      graphics.strokeStyle = "#8b5000";
+      graphics.lineWidth = 1;
+      graphics.stroke();
+
+      graphics.beginPath();
+      graphics.moveTo(85, 180);
+      graphics.lineTo(85, 218);
+      graphics.strokeStyle = "#8b5000";
+      graphics.lineWidth = 1;
+      graphics.stroke();
+      graphics.beginPath();
+      graphics.moveTo(90, 185);
+      graphics.lineTo(90, 215);
+      graphics.strokeStyle = "#8b5000";
+      graphics.lineWidth = 1;
+      graphics.stroke();
+
+   }
+   // Initialization function
+   function init() {
+      canvas   = document.getElementById("myCanvas");
+      graphics = canvas.getContext("2d");
+      draw(); // Draw onto the canvas
+   }
+   window.onload = init; // Runs when window is loaded
+ </script>
+</head>
+<body>
+ <canvas width="800" height="600" id="myCanvas"></canvas>
+</body>
+</html>
